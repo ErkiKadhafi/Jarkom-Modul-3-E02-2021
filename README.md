@@ -131,11 +131,31 @@ Hasil command `ip a` pada masing-masing client :
 
 
 # 5. Client mendapatkan DNS dari EniesLobby dan client dapat terhubung dengan internet melalui DNS tersebut
+
+### a. Konfigurasi pada Jipangu
 Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` yang terdapat di Jipangu dan tambahkan syntax di bawah ini pada konfigurasi switch 1 dan switch 3 setelah option broadcast-address:
 
 ```
     option domain-name-servers 10.30.2.2;
 ```
+
+### b. Konfigurasi pada EniesLobby
+- Edit file /etc/bind/named.conf.options pada server EniesLobby
+- Uncomment pada bagian ini
+
+```
+    forwarders {
+           192.168.122.1;
+    };
+```
+
+- Comment pada bagian ini
+
+`// dnssec-validation auto;`
+
+- Dan tambahkan
+
+`allow-query{any;};`
 
 ### Testing :
 Akan dilakukan testing apakah setiap client dapat terhubung ke internet dengan melakukan ping terhadap google.com, berikut adalah hasilnya :
