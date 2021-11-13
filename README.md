@@ -415,3 +415,132 @@ Setelah itu akses web dengan waktu yang tidak dibolehkan
 ![image](./images/no_10.1.png)
 
 ![image](./images/no_10.2.png)
+
+# 11. Agar transaksi bisa lebih fokus berjalan, maka dilakukan redirect website agar mudah mengingat website transaksi jual beli kapal. Setiap mengakses google.com, akan diredirect menuju super.franky.yyy.com dengan website yang sama pada soal shift modul 2. Web server super.franky.yyy.com berada pada node Skypie
+
+Ketika client mengakses google.com, client akan di-redirect menuju ke super.franky.e02.com. Strategi yang tim E02 lakukan untuk membuat hal ini terwujud adalah dengan memanfaatkan proxy server (Water 7). Pada server proxy, di konfigurasi server proxy (/etc/squid/squid.conf), ditambahkan kode sebagai berikut.
+
+```bash
+acl BLACKLIST dstdomain google.com
+deny_info http://super.franky.e02.com/ BLACKLIST
+http_reply_access deny BLACKLIST
+```
+
+![image](https://user-images.githubusercontent.com/8071604/141642411-283f5d09-ecf1-47b0-8e0a-d49397003a22.png)
+
+Gambar 11.1 Tampilan `vim /etc/squid/squid.conf`
+
+Setelah kode tersebut ditambahkan pada konfigurasi proxy server, proxy server di-restart.
+
+![image](https://user-images.githubusercontent.com/8071604/141642522-e4808dd1-45a4-430a-83d3-825a89bee8aa.png)
+
+Gambar 11.2 Tampilan `service squid restart`
+
+Kemudian, pasang proxy pada client Loguetown dengan menggunakan command berikut ini.
+
+```bash
+export http_proxy=http://jualbelikapal.e02.com:5000
+```
+
+Setelah proxy dipasang, uji coba dilakukan dengan menggunakan aplikasi lynx pada client Loguetown.
+
+```bash
+lynx google.com
+```
+
+![image](https://user-images.githubusercontent.com/8071604/141642628-94b8ffd8-9fe0-47db-a8da-3ff2de98d983.png)
+
+Gambar 11.3 Tampilan `lynx google.com` di Loguetown
+
+Pada Gambar 11.3, ditunjukkan bahwa browser lynx di-redirect menuju halaman http://super.franky.e02.com. 
+
+# 12 & 13. Saatnya berlayar! Luffy dan Zoro akhirnya memutuskan untuk berlayar untuk mencari harta karun di super.franky.e02.com. Tugas pencarian dibagi menjadi dua misi, Luffy bertugas untuk mendapatkan gambar (.png, .jpg), sedangkan Zoro mendapatkan sisanya. Karena Luffy orangnya sangat teliti untuk mencari harta karun, ketika ia berhasil mendapatkan gambar, ia mendapatkan gambar dan melihatnya dengan kecepatan 10 kbps. Sedangkan, Zoro yang sangat bersemangat untuk mencari harta karun, sehingga kecepatan kapal Zoro tidak dibatasi ketika sudah mendapatkan harta yang diinginkannya
+
+Luffy dapat mengakses proxy dengan username:password adalah luffybelikapale02:luffy_e02. Sedangkan, Zoro dapat mengakses proxy dengan username:password adalah zorobelikapale02:zoro_e02.
+Ketika Luffy mendownload file berektensi .jpg atau .png, kecepatan downloadnya harus dibatasi menjadi 10 kbps. Di lain sisi, ketika Zoro mendownload file apapun, kecepatan downloadnya tidak dibatasi.
+
+Pertama-tama, konversi 10 kbps (kilobit per second) menjadi unit Bps (byte per second). 1 bit adalah 0.125 byte. Maka, 10 kbps sama dengan 1250 Bps.
+
+Kedua, buka file /etc/squid/acl-bandwith.conf dan tambahkan kode untuk membatasi bandwith Luffy ketika mendownload file berektensi .jpg atau .png.
+
+```bash
+acl download url_regex -i \.jpg$ \.png$
+auth_param basic program /user/lib/squid/basic_ncsa_auth /etc/squid/passwd
+
+acl luffy proxy_auth luffybelikapale02
+acl zoro proxy_auth zorobelikapale02
+
+delay_pools 2
+delay_class 1 1
+delay_parameters 1 1250/1250
+delay_access 1 allow luffy
+delay_access 1 deny zoro
+delay_access 1 allow download
+delay_access 1 deny all
+```
+
+Penjelasan kode:
+1. `acl download url_regex -i \.jpg$ \.png$`: mendefinisikan `download` adalah URL dengan akhiran .jpg atau .png.
+2. `auth_param basic program /user/lib/squid/basic_ncsa_auth /etc/squid/passwd`: mendefinisikan lokasi username dan password (/etc/squid/passwd).
+3. `acl luffy proxy_auth luffybelikapale02`: mendefinisikan `luffy` adalah akses proxy yang menggunakan username `luffybelikapale02`.
+4. `acl zoro proxy_auth zorobelikapale02`: mendefinisikan `zoro` adalah akses proxy yang menggunakan username `zorobelikapale02`.
+5. `delay_pools 2`: mendefinisikan banyak pool adalah 2.
+6. `delay_class 1 1`: mendefinisikan class pembagian bandwith dari setiap pool 1. 1 artinya semua bandwidth yang ada akan dibagi sama rata untuk semua user squid.
+7. `delay_parameters 1 1250/1250`: mendefinisikan aturan pada pool 1 yaitu restore = 1250 dan max = 1250. Artinya, jika file yang lewat berukuran lebih besar dari 1250 byte, maka bandwith-nya akan dibatasi sebesar 1250 byte perdetik.
+8. `delay_access 1 allow luffy`: mendefinisikan bahwa pool 1 dapat digunakan oleh user luffy.
+9. `delay_access 1 deny zoro`: mendefinisikan bahwa pool 2 tidak dapat digunakan oleh user zoro karena zoro tidak boleh mendapatkan pembatasan bandwith.
+10. `delay_access 1 allow download`: mendefinisikan bahwa aturan `download` yang telah didefinisikan pada baris satu, boleh melalui pool 1.
+11. `delay_access 1 deny all`: mendefinisikan bahwa selain aturan `download`, tidak boleh melalui pool 1.
+
+![image](https://user-images.githubusercontent.com/8071604/141642953-76ac8681-5faf-47fc-9040-103143271623.png)
+
+Gambar 12.1 Tampilan `vim /etc/squid/acl-bandwith.conf`
+
+Setelah file acl-bandwith.conf dibuat, maka di dalam file /etc/squid/squid.conf harus ditambahkan / di-include file acl-bandwith.conf.
+
+```bash
+include /etc/squid/acl-bandwith.conf
+```
+
+![image](https://user-images.githubusercontent.com/8071604/141643707-09057ee3-d0fc-4374-b7a0-0a98aa6c829b.png)
+
+Gambar 12.2 Tampilan `vim /etc/squid/squid.conf`
+
+Setelah itu, proxy server di-restart dengan menggunakan perintah `service squid restart`.
+
+![image](https://user-images.githubusercontent.com/8071604/141643782-bb263fc4-f1cb-421e-9278-615890bf5e44.png)
+
+Gambar 12.3 Tampilan `service squid restart`
+
+Kemudian uji coba dilakukan pada client Alabasta. Pertama, install `wget` (`apt-get install wget`) dan buka file `/etc/wgetrc` pada client Alabasta.
+
+![image](https://user-images.githubusercontent.com/8071604/141643861-571f90cb-381b-4afc-a9f3-80d8c346588e.png)
+
+Gambar 12.4 Tampilan `apt-get install wget`
+
+Di dalam file `/etc/wgetrc`, uncomment bagian `use_proxy = on` dan set value dari `http_proxy` menjadi `http://[username]:[password]@[host]:[port]`. 
+Pada kasus ini, username yang akan diuji adalah luffybelikapale02 dengan password luffy_e02 di host jualbelikapal.e02.com di port 5000.
+
+```bash
+http_proxy = http://luffybelikapale02:luffy_e02@jualbelikapal.e02.com:5000
+use_proxy = on
+```
+
+![image](https://user-images.githubusercontent.com/8071604/141643956-461076d0-0864-4264-a1e9-bd51306df403.png)
+
+Gambar 12.5 Tampilan `vim /etc/wgetrc`
+
+Setelah itu, simpan `/etc/wgetrc` dan `wget http://super.franky.e02.com/public/images/car.jpg` dilakukan untuk menguji coba download file car.jpg yang ada di web server Skypie melalui proxy dengan user luffy.
+
+![image](https://user-images.githubusercontent.com/8071604/141644002-45b51bdd-bdd4-4ee4-91a2-b1b2e3438351.png)
+
+Gambar 12.6 Tampilan wget dengan kecepatan < 10 kbps dengan user luffy
+
+Berdasarkan hasil uji coba yang ditunjukkan pada Gambar 12.6, user luffy mendapatkan limitasi bandwith sehingga bandwith-nya tidak dapat melebihi 10kbps. Di lain sisi, uji coba dilakukan untuk user zoro dengan mengubah value `http_proxy` pada `/etc/wgetrc` menjadi `http://zorobelikapale02:zoro_e02@jualbelikapal.e02.com:5000`.
+
+![image](https://user-images.githubusercontent.com/8071604/141644069-f33f39ec-4c46-4c0d-9e6e-4002ab25f2ac.png)
+
+Gambar 12.7 Tampilan wget tanpa batasan kecepatan dengan user zoro
+
+Berdasarkan hasil uji coba, wget dengan user zoro jauh lebih cepat daripada luffy. Tidak perlu menunggu, file yang didownload zoro langsung dapat diterima oleh Alabasta.
+Dengan demikian, kecepatan download luffy dibatasi maksimal 10kbps ketika mengakses file car.jpg dan kecepatan zoro tidak dibatasi ketika mengakses file car.jpg
