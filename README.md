@@ -280,7 +280,7 @@ Edit **SOA** menjadi `e02.com.`
 ...
 ```
 
-Lalu ubah konfigurasi menjadi domain `e02.com.` dan tambahkan subdoamain `jualbelikapal` dengan IP mengarah ke `Jipangu`.
+Lalu ubah konfigurasi menjadi domain `e02.com.` dan tambahkan subdoamain `jualbelikapal` dengan IP mengarah ke `Water7`.
 
 ```
 ...
