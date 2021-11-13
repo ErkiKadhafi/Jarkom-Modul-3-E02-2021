@@ -208,7 +208,7 @@ subnet 10.30.3.0 netmask 255.255.255.0 {
 
 ![image](https://user-images.githubusercontent.com/70801807/141643651-f6fc99e8-cc04-4334-8927-81d7d4b81870.png)
 
-- Buka file dhcpd.conf yang terdapat di dalam folder `etc/default/dhcp`
+- Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp`
 - Tambahkan syntax di bawah ini pada bagian paling bawah di file tersebut :
 
 ```
