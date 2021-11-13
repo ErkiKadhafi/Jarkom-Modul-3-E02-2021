@@ -544,3 +544,6 @@ Gambar 12.7 Tampilan wget tanpa batasan kecepatan dengan user zoro
 
 Berdasarkan hasil uji coba, wget dengan user zoro jauh lebih cepat daripada luffy. Tidak perlu menunggu, file yang didownload zoro langsung dapat diterima oleh Alabasta.
 Dengan demikian, kecepatan download luffy dibatasi maksimal 10kbps ketika mengakses file car.jpg dan kecepatan zoro tidak dibatasi ketika mengakses file car.jpg
+
+# Kesulitan yang dialami selama mengerjakan soal shift modul 3
+1. Keterbatasan dokumentasi pada aplikasi squid. Di internet, dokumentasi squid masih minim sehingga butuh waktu lumayan lama untuk mempelajarinya.
