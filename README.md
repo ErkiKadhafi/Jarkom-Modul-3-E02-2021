@@ -151,11 +151,15 @@ Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` yang terdapat di J
 
 - Comment pada bagian ini
 
-`// dnssec-validation auto;`
+```
+// dnssec-validation auto;
+```
 
 - Dan tambahkan
 
-`allow-query{any;};`
+```
+allow-query{any;};
+```
 
 ### Testing :
 Akan dilakukan testing apakah setiap client dapat terhubung ke internet dengan melakukan ping terhadap google.com, berikut adalah hasilnya :
