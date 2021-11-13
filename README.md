@@ -4,19 +4,65 @@
 
 Berdasarkan soal di atas maka akan dilakukan beberapa konfigurasi pada node EniesLobby, Jipangu, Water7 sebagai berikut :
 
--   EniesLobby
+- EniesLobby
+Pada praktikum kali ini EniesLobby berperan menjadi DNS Server maka akan dilakukan instalasi bind9 dengan command sebagai berikut :
 
--   Jipangu
+```
+apt-get update
+apt-get install bind9 -y
+```
 
--   Water7
+- Jipangu
+Pada praktikum kali ini Jipangu berperan menjadi DHCP Server, maka akan dilakukan instalasi isc dhcp server dengan command sebagai berikut :
+
+```
+apt-get update
+apt-get install isc-dhcp-server -y
+```
+
+- Water7
+Pada praktikum kali ini Water7 berperan menjadi Proxy Server, maka akan dilakukan instalasi squid dengan command sebagai berikut :
+
+```
+apt-get update
+apt-get install squid -y
+```
 
 # 2. Foosha sebagai DHCP Relay
 
-Berikut ini adalah instalasi yang dilakukann pada node Foosha untuk menjadikannya DHCP Relay :
+Pada praktikum kali ini Foosha berperan menjadi DHCP Relay, maka akan dilakukan instalasi isc dhcp relay dengan command sebagai berikut :
+
+```
+apt-get update
+apt-get install isc-dhcp-relay -y
+```
+
+Setelah dilakukan instalasi, akan dilakukan konfigurasi yang dapat diatur saat service isc-dhcp-relay start atau pun pada file `etc/default/isc-dhcp-relay` sebagai berikut :
+
+![image](https://user-images.githubusercontent.com/70801807/141642727-b7eeab05-f82f-46e4-b100-9c7a8849f21e.png)
+
 
 # Semua client yanga ada HARUS menggunakan konfigurasi IP dari DHCP Server.
+Konfigurasi IP pada semua client dapat dilakukan dengan klik kanan pada masing-masing node client dan pilih `configure` lalu menuju ke `Edit network configuration`. Berikut adalah konfigurasi masing-masing client :
 
-# Syntax konfigurasi nomor 3, 4, 5, 6.
+- Loguetown
+
+![image](https://user-images.githubusercontent.com/70801807/141642807-30716e70-837f-46e7-8967-6bdc200e0ed3.png)
+
+- Alabasta
+
+![image](https://user-images.githubusercontent.com/70801807/141642834-6f17f322-a396-46e1-9f30-c9b42363b7b4.png)
+
+- TottoLand
+
+![image](https://user-images.githubusercontent.com/70801807/141642859-1b8438e4-0a69-45df-852c-8920994fd7b2.png)
+
+- Skypie
+
+![image](https://user-images.githubusercontent.com/70801807/141642881-337b6e01-6562-4457-864a-b3e3e9f9e55c.png)
+
+
+### Syntax konfigurasi nomor 3, 4, 5, 6.
 
 ```
 subnet 'NID' netmask 'Netmask' {
@@ -29,15 +75,154 @@ subnet 'NID' netmask 'Netmask' {
 }
 ```
 
-# 3. Client yang melalui Switch1 mendapatkan range IP dari [prefix IP].1.20 - [prefix IP].1.99 dan [prefix IP].1.150 - [prefix IP].1.169
 
-# 4. Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.30 - [prefix IP].3.50
+# 3.  Client yang melalui Switch1 mendapatkan range IP dari [prefix IP].1.20 - [prefix IP].1.99 dan [prefix IP].1.150 - [prefix IP].1.169
+Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` dan tambahkan syntax di bawah ini pada bagian paling bawah file tersebut :
+
+```
+subnet 10.30.1.0 netmask 255.255.255.0 {
+    range 10.30.1.20 10.30.1.99;
+    range 10.30.1.150 10.30.1.169;
+    option routers 10.30.1.1;
+    option broadcast-address 10.30.1.255;
+}
+```
+
+### Testing :
+Jika dilakukan pengetesan pada client Loguetown & Alabasta maka IP masing-masing client berada pada range sesuai settingan di atas:
+
+Hasil command `ip a` pada masing-masing client :
+
+- Loguetown
+
+![image](https://user-images.githubusercontent.com/70801807/141643461-3028a873-0555-4b99-a39b-b9e3b3bc68c4.png)
+
+- Alabasta
+
+![image](https://user-images.githubusercontent.com/70801807/141643498-425aff29-cf48-4d24-904c-5a9fe5ab7b27.png)
+
+
+# 4. Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.30 - [prefix IP].3.50 
+Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` dan tambahkan syntax di bawah ini pada bagian paling bawah file tersebut di bawah konfigurasi switch 1:
+
+```
+subnet 10.30.3.0 netmask 255.255.255.0 {
+    range 10.30.3.30 10.30.3.50;
+    option routers 10.30.3.1;
+    option broadcast-address 10.30.3.255;
+}
+```
+
+### Testing :
+Jika dilakukan pengetesan pada client TottoLand & Skypie maka IP masing-masing client berada pada range sesuai settingan di atas:
+
+Hasil command `ip a` pada masing-masing client :
+
+- TottoLand
+
+![image](https://user-images.githubusercontent.com/70801807/141643515-22ec0308-f284-446d-8047-5bb961e381db.png)
+
+- Skypie
+
+![image](https://user-images.githubusercontent.com/70801807/141643651-f6fc99e8-cc04-4334-8927-81d7d4b81870.png)
+
 
 # 5. Client mendapatkan DNS dari EniesLobby dan client dapat terhubung dengan internet melalui DNS tersebut
+Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` dan tambahkan syntax di bawah ini pada konfigurasi switch 1 dan switch 3 setelah option broadcast-address:
+
+```
+    option domain-name-servers 10.30.2.2;
+```
+
+### Testing :
+Akan dilakukan testing apakah setiap client dapat terhubung ke internet dengan melakukan ping terhadap google.com, berikut adalah hasilnya :
+
+- Loguetown
+
+![image](https://user-images.githubusercontent.com/70801807/141643757-2958f44d-35eb-4cf1-a18f-1d81a14d1ad7.png)
+
+- Alabasta
+
+![image](https://user-images.githubusercontent.com/70801807/141643739-b14181d4-6218-4b6c-8c44-a2409e70bb86.png)
+
+- TottoLand
+
+![image](https://user-images.githubusercontent.com/70801807/141643719-e0e118d7-5841-4af7-8c4b-39347ebd4e17.png)
+
+- Skypie
+
+![image](https://user-images.githubusercontent.com/70801807/141643703-7c2bf291-9c92-47e8-a6cc-864580663067.png)
+
+
 
 # 6. Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama 6 menit sedangkan pada client yang melalui Switch3 selama 12 menit. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama 120 menit.
+- Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` 
+- Tambahkan syntax di bawah ini pada konfigurasi switch 1 setelah option domain-name-servers:
+
+```
+    default-lease-time 360;
+    max-lease-time 7200;
+```
+
+- Tambahkan syntax di bawah ini pada konfigurasi switch 3 setelah option domain-name-servers:
+
+```
+    default-lease-time 720;
+    max-lease-time 7200;
+```
+
+### Jika mengikuti langkah-langkah nomor 3-6 maka konfigurasi akhir untuk masing-masing switch pada file dhcpd.conf adalah sebagai berikut :
+
+- Switch 1 :
+
+```
+subnet 10.30.1.0 netmask 255.255.255.0 {
+    range 10.30.1.20 10.30.1.99;
+    range 10.30.1.150 10.30.1.169;
+    option routers 10.30.1.1;
+    option broadcast-address 10.30.1.255;
+    option domain-name-servers 10.30.2.2;
+    default-lease-time 360;
+    max-lease-time 7200;
+}
+```
+
+- Switch 3 :
+
+```
+subnet 10.30.3.0 netmask 255.255.255.0 {
+    range 10.30.3.30 10.30.3.50;
+    option routers 10.30.3.1;
+    option broadcast-address 10.30.3.255;
+    option domain-name-servers 10.30.2.2;
+    default-lease-time 720;
+    max-lease-time 7200;
+}
+```
 
 # 7. Luffy dan Zoro berencana menjadikan Skypie sebagai server untuk jual beli kapal yang dimilikinya dengan alamat IP yang tetap dengan IP [prefix IP].3.69
+- Hasil command `ip a` sebelum konfigurasi :
+
+![image](https://user-images.githubusercontent.com/70801807/141643703-7c2bf291-9c92-47e8-a6cc-864580663067.png)
+
+- Buka file dhcpd.conf yang terdapat di dalam folder `etc/default/dhcp`
+- Tambahkan syntax di bawah ini pada bagian paling bawah di file tersebut :
+
+```
+host Skypie{
+        hardware ethernet b6:d1:f7:f9:74:e2;
+        fixed-address 10.30.3.69;
+}
+```
+
+- Edit network configuration Skypie menjadi berikut ini :
+
+![image](https://user-images.githubusercontent.com/70801807/141643942-0afee065-f37e-4b30-be75-4ee41566887d.png)
+
+- Hasil command `ip a` setelah konfigurasi:
+
+![image](https://user-images.githubusercontent.com/70801807/141643958-5923fea1-3642-4535-9c0e-efcf9a59ac45.png)
+
 
 # 8. Loguetown digunakan sebagai client Proxy agar transaksi jual beli dapat terjamin keamanannya, juga untuk mencegah kebocoran data transaksi.Pada Loguetown, proxy harus bisa diakses dengan nama jualbelikapal.yyy.com dengan port yang digunakan adalah 5000
 
