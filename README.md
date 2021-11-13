@@ -80,7 +80,7 @@ subnet 'NID' netmask 'Netmask' {
 
 
 # 3.  Client yang melalui Switch1 mendapatkan range IP dari [prefix IP].1.20 - [prefix IP].1.99 dan [prefix IP].1.150 - [prefix IP].1.169
-Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` dan tambahkan syntax di bawah ini pada bagian paling bawah file tersebut :
+Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` yang terdapat di Jipangu dan tambahkan syntax di bawah ini pada bagian paling bawah file tersebut :
 
 ```
 subnet 10.30.1.0 netmask 255.255.255.0 {
@@ -106,7 +106,7 @@ Hasil command `ip a` pada masing-masing client :
 
 
 # 4. Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.30 - [prefix IP].3.50 
-Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` dan tambahkan syntax di bawah ini pada bagian paling bawah file tersebut di bawah konfigurasi switch 1:
+Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` yang terdapat di Jipangu dan tambahkan syntax di bawah ini pada bagian paling bawah file tersebut di bawah konfigurasi switch 1:
 
 ```
 subnet 10.30.3.0 netmask 255.255.255.0 {
@@ -131,7 +131,7 @@ Hasil command `ip a` pada masing-masing client :
 
 
 # 5. Client mendapatkan DNS dari EniesLobby dan client dapat terhubung dengan internet melalui DNS tersebut
-Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` dan tambahkan syntax di bawah ini pada konfigurasi switch 1 dan switch 3 setelah option broadcast-address:
+Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` yang terdapat di Jipangu dan tambahkan syntax di bawah ini pada konfigurasi switch 1 dan switch 3 setelah option broadcast-address:
 
 ```
     option domain-name-servers 10.30.2.2;
@@ -159,7 +159,7 @@ Akan dilakukan testing apakah setiap client dapat terhubung ke internet dengan m
 
 
 # 6. Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama 6 menit sedangkan pada client yang melalui Switch3 selama 12 menit. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama 120 menit.
-- Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` 
+- Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` yang terdapat di Jipangu
 - Tambahkan syntax di bawah ini pada konfigurasi switch 1 setelah option domain-name-servers:
 
 ```
@@ -204,11 +204,11 @@ subnet 10.30.3.0 netmask 255.255.255.0 {
 ```
 
 # 7. Luffy dan Zoro berencana menjadikan Skypie sebagai server untuk jual beli kapal yang dimilikinya dengan alamat IP yang tetap dengan IP [prefix IP].3.69
-- Hasil command `ip a` sebelum konfigurasi :
+- Hasil command `ip a` pada Skypie sebelum konfigurasi :
 
 ![image](https://user-images.githubusercontent.com/70801807/141643651-f6fc99e8-cc04-4334-8927-81d7d4b81870.png)
 
-- Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp`
+- Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` yang terdapat di Jipangu
 - Tambahkan syntax di bawah ini pada bagian paling bawah di file tersebut :
 
 ```
