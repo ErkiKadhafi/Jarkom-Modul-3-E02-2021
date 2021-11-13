@@ -5,6 +5,7 @@
 Berdasarkan soal di atas maka akan dilakukan beberapa konfigurasi pada node EniesLobby, Jipangu, Water7 sebagai berikut :
 
 - EniesLobby
+
 Pada praktikum kali ini EniesLobby berperan menjadi DNS Server maka akan dilakukan instalasi bind9 dengan command sebagai berikut :
 
 ```
@@ -13,6 +14,7 @@ apt-get install bind9 -y
 ```
 
 - Jipangu
+
 Pada praktikum kali ini Jipangu berperan menjadi DHCP Server, maka akan dilakukan instalasi isc dhcp server dengan command sebagai berikut :
 
 ```
@@ -21,6 +23,7 @@ apt-get install isc-dhcp-server -y
 ```
 
 - Water7
+
 Pada praktikum kali ini Water7 berperan menjadi Proxy Server, maka akan dilakukan instalasi squid dengan command sebagai berikut :
 
 ```
