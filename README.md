@@ -161,6 +161,10 @@ Buka file dhcpd.conf yang terdapat di dalam folder `etc/dhcp` yang terdapat di J
 allow-query{any;};
 ```
 
+- Restart bind9
+```
+service bind9 restart
+```
 ### Testing :
 Akan dilakukan testing apakah setiap client dapat terhubung ke internet dengan melakukan ping terhadap google.com, berikut adalah hasilnya :
 
